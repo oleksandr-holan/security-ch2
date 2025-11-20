@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 10: Secured Version</title>
+    <style>
+        body { font-family: sans-serif; padding: 2rem; background-color: #e0f7fa; } /* Changed color to verify new version */
+        .container { max-width: 400px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 10px; margin: 10px 0; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #00897b; color: white; border: none; cursor: pointer; }
+        button:hover { background: #00695c; }
+        #result { margin-top: 20px; white-space: pre-wrap; word-break: break-all; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>SECURED Login System</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function login() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    let output = `<h3 class="success">Access Granted!</h3>`;
+                    output += `<strong>Safe Query:</strong><br><code>${data.debug_query}</code><br><br>`;
+                    output += `<strong>Data:</strong><br>${JSON.stringify(data.data, null, 2)}`;
+                    resultDiv.innerHTML = output;
+                } else {
+                    resultDiv.innerHTML = `<h3 class="error">Access Denied (Attack Failed)</h3>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<h3 class="error">Error: ${e.message}</h3>`;
+            }
+        }
+    </script>
+</body>
+</html>
